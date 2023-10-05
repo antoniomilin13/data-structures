@@ -22,6 +22,7 @@ struct ClientInfo
 {
     string name;
     string problem;
+    int queue_number;
 };
 
 // here I declare variables for each node
@@ -51,12 +52,15 @@ class VisitList
     public:
         
         VisitList() : head(NULL){}
-
+        
+        int queue_number = 0;
         void insert (string name, string problem) 
         {
+            queue_number++;
             Node *newnode = create();
             newnode->client.name = name;
             newnode->client.problem = problem;
+            newnode->client.queue_number = queue_number;
 
             if (head == NULL) {
                 head = newnode;
@@ -71,15 +75,41 @@ class VisitList
                 newnode->next = NULL;
             }
         }
+
+        void delete_node (int queue_number) {
+            Node *current = head;
+            Node *previous = head;
+
+            if (head->client.queue_number == queue_number) {
+                head = head->next;
+                delete current;
+                return;
+            }
+            
+            while (current->client.queue_number != queue_number && current != NULL) {
+                previous = current;
+                current = current->next;
+            }
+            if (current != NULL) {
+                previous->next = current->next;
+                delete current;
+                return;
+            } else{
+                cout << "There is noone with thyat number" << endl;
+            }
+            
+        }
+
         void display () {
             Node *current = head;
-            int i = 1;
-
+            
+            cout << "------------------ - - - -  -  -  -" << endl;
+            
             while (current != NULL) {
-                cout << i <<  ". " <<  current->client.name << " -> " << current->client.problem << endl;
+                cout << current->client.queue_number <<  ". " <<  current->client.name << " -> " << current->client.problem << endl;
                 current = current->next;
-                i++;
             }
+            cout << "------------------ - - - -  -  -  -" << endl;
         }
 };
 
@@ -110,6 +140,23 @@ int main()
 
     upotreba_kupona.display();
 
+    // part where person can leave the queue and delete his number
+
+    string queue_flag;
+    int queue_number;
+
+    cout << "did anyone leave the queue? ";
+    cin >> queue_flag;
+
+    if (queue_flag == "y") {
+        cout << "what is his queue number? ";
+        cin >> queue_number;
+
+        upotreba_kupona.delete_node(queue_number);
+    }
+
+    upotreba_kupona.display();
+    
     return 0;
 }
 
